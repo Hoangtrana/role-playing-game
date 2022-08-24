@@ -1,5 +1,5 @@
 import characterData from "./data.js";
-import { Character } from "./Charater.js";
+import { Character } from "./Character.js";
 
 /*
 CHALLENGE
@@ -16,18 +16,18 @@ function attack() {
   wizard.takeDamage(orc.currentDiceScore);
   orc.takeDamage(wizard.currentDiceScore);
   render();
+  if (wizard.dead || orc.dead) {
+    endGame();
+  }
 }
 
 document.getElementById("attack-button").addEventListener("click", attack);
 
-const wizard = new Character(characterData.monster);
+const wizard = new Character(characterData.hero);
 console.log(characterData.monster);
-const orc = new Character(characterData.hero);
+const orc = new Character(characterData.monster);
 
-/* MINI CHALLENGE */
-// 1 Create one render() function that calls both wizard and orc
-//  so we can control when they render.
-
+// Game render
 function render() {
   document.getElementById("hero").innerHTML = wizard.getCharacterHtml();
   document.getElementById("monster").innerHTML = orc.getCharacterHtml();
@@ -35,4 +35,27 @@ function render() {
 
 render();
 
-// 2 call the function.
+// End game
+function endGame() {
+  const endEmoji =
+    wizard.health === 0 && orc.health === 0
+      ? "☠️"
+      : wizard.health > 0
+      ? "🔮"
+      : "☠️";
+  const endMessage =
+    wizard.health === 0 && orc.health === 0
+      ? "No victors - all creatures are dead"
+      : wizard.health > 0
+      ? "The Wizard Wins"
+      : "The Orc is Victorious";
+  let endGameEl = "";
+  endGameEl = `<div class="end-game">
+      <h2>Game Over</h2>
+      <h3>${endMessage}</h3>
+      <p class="end-emoji">${endEmoji}</p>
+  </div>`;
+
+  document.body.innerHTML = endGameEl;
+  console.log(endMessage);
+}

@@ -7,16 +7,12 @@ Challenge
 2. Rewrite the getDiceHtml method so it updates currentDiceScore 
  with the values returned by getDiceRollArray.
 */
-
+const getPercentage = (remainingHealth, maximumHealth) =>
+  (100 * remainingHealth) / maximumHealth;
 function Character(data) {
   Object.assign(this, data);
-  this.takeDamage = function (attackScoreArray) {
-    console.log(`${this.name}: ${attackScoreArray}`);
-  };
-
-  this.diceArray = getDicePlaceholderHtml(this.diceCount);
-
-  this.getDiceHtml = function () {
+  this.maxHealth = this.health;
+  this.getDiceHtml = () => {
     this.currentDiceScore = getDiceRollArray(this.diceCount);
     this.diceArray = this.currentDiceScore
       .map(function (num) {
@@ -24,7 +20,21 @@ function Character(data) {
       })
       .join(" ");
   };
-  this.getCharacterHtml = function () {
+  this.takeDamage = function (attackScoreArray) {
+    const totalAttackScore = attackScoreArray.reduce(
+      (total, currentScore) => total + currentScore
+    );
+    this.health -= totalAttackScore;
+    if (this.health <= 0) {
+      this.dead = true;
+      this.health = 0;
+    }
+    console.log(getPercentage(this.health, this.maxHealth));
+  };
+
+  this.diceArray = getDicePlaceholderHtml(this.diceCount);
+
+  this.getCharacterHtml = () => {
     const { elementId, name, avatar, health, diceCount, diceArray } = this;
     let diceHtml = this.getDiceHtml(diceCount);
 
