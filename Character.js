@@ -1,4 +1,8 @@
-import { getDiceRollArray, getDicePlaceholderHtml } from "./utils.js";
+import {
+  getDiceRollArray,
+  getDicePlaceholderHtml,
+  getPercentage,
+} from "./utils.js";
 
 /*
 Challenge
@@ -7,12 +11,19 @@ Challenge
 2. Rewrite the getDiceHtml method so it updates currentDiceScore 
  with the values returned by getDiceRollArray.
 */
-const getPercentage = (remainingHealth, maximumHealth) =>
-  (100 * remainingHealth) / maximumHealth;
+
 function Character(data) {
   Object.assign(this, data);
   this.maxHealth = this.health;
-  this.getDiceHtml = () => {
+  this.getHealthBarHtml = () => {
+    const percent = getPercentage(this.health, this.maxHealth);
+    return `<div class="health-bar-outer">
+    <div class="health-bar-inner + ${percent <= 25 ? "danger" : ""}"
+        style="width: ${percent}%">
+    </div>
+</div>`;
+  };
+  this.getDiceHtml = function () {
     this.currentDiceScore = getDiceRollArray(this.diceCount);
     this.diceArray = this.currentDiceScore
       .map(function (num) {
@@ -20,16 +31,16 @@ function Character(data) {
       })
       .join(" ");
   };
+
   this.takeDamage = function (attackScoreArray) {
     const totalAttackScore = attackScoreArray.reduce(
-      (total, currentScore) => total + currentScore
+      (total, num) => total + num
     );
     this.health -= totalAttackScore;
     if (this.health <= 0) {
       this.dead = true;
       this.health = 0;
     }
-    console.log(getPercentage(this.health, this.maxHealth));
   };
 
   this.diceArray = getDicePlaceholderHtml(this.diceCount);
@@ -37,12 +48,19 @@ function Character(data) {
   this.getCharacterHtml = () => {
     const { elementId, name, avatar, health, diceCount, diceArray } = this;
     let diceHtml = this.getDiceHtml(diceCount);
-
+    const healthBar = this.getHealthBarHtml();
     return `
           <div class="character-card">
+           
               <h4 class="name"> ${name} </h4>
+              <div></div>
               <img class="avatar" src="${avatar}" />
-            <div class="health">health: <b> ${health} </b></div>
+             
+              
+            <div class="health">health: <b> ${health} </b>
+            ${healthBar}
+            </div>
+           
               <div class="dice-container">
                   ${diceArray}
               </div>
